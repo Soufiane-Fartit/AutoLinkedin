@@ -5,7 +5,6 @@ from docx.oxml.ns import qn
 from docx.oxml.shared import OxmlElement
 from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from resume_data import *
 from utils import getSkills, clusterSkills, merge_skills
 
 def add_header(doc, header):
@@ -324,6 +323,9 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
 
     return doc
 
+with open('resume_data.json', 'r') as f:
+    d = json.load(f)
+    header, profil, formation, experience, skills, certifs, projects, langues = d['header'], d['profil'], d['formation'], d['experience'], d['skills'], d['certifs'], d['projects'], d['langues']
 
 # LOAD PARSED DATA
 with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'r') as jobs_file:
