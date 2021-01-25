@@ -1,3 +1,5 @@
+> :warning: **Use at your own risks**: This project is just for fun. I advise against actually using it in real life.
+
 ## What does it do ?
 Scrap Linkedin for jobs, search for skills, and create a custom resume that contains the needed keywords to avoid being stopped by ATS systems.
 
