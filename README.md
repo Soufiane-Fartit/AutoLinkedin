@@ -24,18 +24,23 @@ Scrap Linkedin for jobs, search for skills, and create a custom resume that cont
 
 Fill the autoCV/data.py with personal infos, then run the commands :
 
-> make cleaning :
+> deletes all created files :
+```
+make cleaning
+````
 
-deletes all created files
+> scrap linkedin for jobs :
+```
+make scraping
+```
 
-> make scraping :
+> extract skills from jobs :
+```
+make parsing
+```
 
-scrap linkedin for jobs
+> generate custom resumes for each job :
+```
+make generating
+```
 
-> make parsing :
-
-extract skills from jobs
-
-> make generating :
-
-generate custom resumes for each job
