@@ -6,6 +6,8 @@ from utils import *
 from getpass import getpass
 
 class Scraper:
+    """CONNETS TO LINKEDIN AND SEARCH FOR JOBS. JOBS FOUND WILL BE STORED IN /DATA/JOBSFOUND.JSON
+    """
     def __init__(self, search_links, driver_path="./chromedriver"):
         self.username = input("Your Email Please : ")
         self.password = getpass("Your Password Please : ")
@@ -17,6 +19,8 @@ class Scraper:
         
 
     def login(self):
+        """CONNECTS TO LINKEDIN
+        """
         self.browser.get('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
         time.sleep(3)
 
@@ -32,15 +36,21 @@ class Scraper:
         elementID.submit()
     
     def dumpJobsFound(self):
+        """SAVE JOBS INTO A JSON FILE
+        """
         import json
         with open('../../data/jobsFound.json', 'w') as fout:
             json.dump(self.job_dicts, fout, ensure_ascii=False, indent = 4)
 
     def scrapAllLinks(self):
+        """ITERATE OVER LINKS PROVIDED AND SCRAP JOBS FROM THEM
+        """
         for search_link in self.search_links:
             self.scrapLink(search_link)
 
     def scrapLink(self, search_link):
+        """GIVEN A LINK IT ITERATES OVER JOBS ONE BY ONE AND SCRAP INFORMATION
+        """
         self.browser.get(search_link)
 
         # Iterate over jobs
@@ -96,6 +106,7 @@ class Scraper:
             except :
                 pass
 
+# LINKS TO LOOK UP
 search_links = ["https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&keywords=data%20scientist%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance",
                 "https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&geoId=105015875&keywords=machine%20learning%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance&location=France",
                 "https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&geoId=105015875&keywords=data%20analyst%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance&location=France"]

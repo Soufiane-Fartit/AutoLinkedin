@@ -1,3 +1,4 @@
+import json
 from docx import Document
 from docx.shared import Cm, Pt
 from docx.oxml.ns import qn
@@ -8,6 +9,15 @@ from data import *
 from utils import getSkills, clusterSkills, merge_skills
 
 def add_header(doc, header):
+    """ADD THE HEADER OF THE RESUME (NAME, ADRESS, EMAIL...)
+
+    Args:
+        doc ([docx document]): [description]
+        header ([json]): json containing the name, adress, email ..
+
+    Returns:
+        [docx document]: the same docx document with the header added to it
+    """
     for i, elem in enumerate(header) :
         if i == 0 :
             p = doc.add_paragraph(elem)
@@ -30,6 +40,15 @@ def add_header(doc, header):
 
 
 def add_profil(doc, profil):
+    """ADD FEW LINES ABOUT THE PERSON
+
+    Args:
+        doc ([type]): [description]
+        profil ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "PROFIL")
     for elem in profil :
         p = doc.add_paragraph(elem)
@@ -38,6 +57,15 @@ def add_profil(doc, profil):
     return doc
 
 def add_formation(doc, formation):
+    """ADD EDUCATION SECTION TO THE RESUME
+
+    Args:
+        doc ([type]): [description]
+        formation ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "FORMATION ACADEMIQUE")
     for form in formation :
         p = doc.add_paragraph(form['date']+' : '+form['diplome']+' - '+form['ecole'])
@@ -49,6 +77,15 @@ def add_formation(doc, formation):
     return doc
 
 def add_experience(doc, experience):
+    """ADD EXPERIENCE SECTION TO THE RESUME
+
+    Args:
+        doc ([type]): [description]
+        experience ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "EXPERIENCE PROFESSIONNELLE")
     for exp in experience :
         # ADD JOB TITLE LINE
@@ -84,6 +121,15 @@ def add_experience(doc, experience):
     return doc
 
 def add_skills(doc, skills, skills_var=None):
+    """ADD SKILLS SECTION TO THE RESUME
+
+    Args:
+        doc ([type]): [description]
+        experience ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "COMPETENCES TECHNIQUES")
     default_skills = [item.lower() for sublist in skills.values() for item in sublist]
     missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
@@ -100,6 +146,15 @@ def add_skills(doc, skills, skills_var=None):
     return doc
 
 def add_certif_projects(doc, certifs, projects):
+    """ADD CERTIFICATIONS AND PROJECTS SECTION TO THE RESUME
+
+    Args:
+        doc ([type]): [description]
+        experience ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "CERTIFICATIONS ET PROJETS PERSONNELS")
 
     for certif in certifs:
@@ -112,6 +167,15 @@ def add_certif_projects(doc, certifs, projects):
     return doc
 
 def add_langues(doc, langues):
+    """ADD LANGUAGES SECTION TO THE RESUME
+
+    Args:
+        doc ([type]): [description]
+        experience ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     doc = add_title(doc, "LANGUES")
     
     p = doc.add_paragraph((5*' '+3*'\t').join([k+' : '+v for k,v in langues.items()]))
@@ -123,6 +187,15 @@ def add_langues(doc, langues):
     return doc
 
 def set_margin(doc, margin = 1.0):
+    """SET THE MARGIN OF THE DOCX TO MAKE OT WIDER
+
+    Args:
+        doc ([type]): [description]
+        margin (float, optional): [description]. Defaults to 1.0.
+
+    Returns:
+        [type]: [description]
+    """
     sections = document.sections
     for section in sections:
         section.top_margin = Cm(margin)
@@ -157,6 +230,9 @@ def insert_element_before(parent, elm, successors):
 
 
 def add_title(doc, title):
+    """
+    ADD THE TITLE OF A SECTION
+    """
     pp = doc.add_paragraph()
     pp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     pp.paragraph_format.space_before = Cm(0.3)
@@ -204,6 +280,24 @@ def add_title(doc, title):
     return doc
 
 def redact_cv(doc, header, profil, formation, experience, skills, certifs, projects, langues, skills_var=None):
+    """
+    CREATE A RESUME FROM A JSON CONTAINING INFOS ABOUT A JOB
+
+    Args:
+        doc ([type]): [description]
+        header ([type]): [description]
+        profil ([type]): [description]
+        formation ([type]): [description]
+        experience ([type]): [description]
+        skills ([type]): [description]
+        certifs ([type]): [description]
+        projects ([type]): [description]
+        langues ([type]): [description]
+        skills_var ([type], optional): [description]. Defaults to None.
+
+    Returns:
+        [docx document]: THE FULL RESUME GENERATED
+    """
     # ADD NAME, PHONE, ADRESS, EMAIL ...
     doc = add_header(doc, header)
 
@@ -231,11 +325,11 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
     return doc
 
 
-import json
-
+# LOAD PARSED DATA
 with open('../../data/jobsFoundParsed.json', 'r') as jobs_file:
     jobs = json.load(jobs_file)
 
+# ITERATE OVER JOBS AND GENERATE CUSTOM RESUMES
 for i, job in enumerate(jobs) :
     job_skills = job['skills_found']
     
@@ -246,15 +340,8 @@ for i, job in enumerate(jobs) :
     document = redact_cv(document, header, profil, formation, experience, skills, certifs, projects, langues, job_skills)
     document.save('../../data/CVs/CV_'+str(i)+'.docx')
 
-    # REPLACE TITLE
-    """
-    for paragraph in document.paragraphs:
-        if '<job_title>' in paragraph.text:
-            print(paragraph.text)
-            print(job['title'])
-            paragraph.text = job['title']
-    """
 
+# SAVE FILE NAMES OF THE RESUMES IN THE JSON FILE
 with open('../../data/jobsFoundParsed.json', 'w') as fout:
     jobs = [job for job in jobs if 'skills_found' in job]
     json.dump(jobs, fout, ensure_ascii=False, indent = 4)

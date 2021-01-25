@@ -7,13 +7,16 @@ from utils import getSkillsList
 all_skills_found = []
 jobs_skills = []
 
+# LOAD JOBS SCRAPED
 with open('../../data/jobsFound.json', 'r') as jobs_file:
     jobs = json.load(jobs_file)
 
+"""
 skills = []
 with open('../../data/all_linkedin_skills.txt', 'r') as jobs_file:
     for line in jobs_file:
         skills.append(line.rstrip("\n"))
+"""
 
 for i, job in enumerate(jobs) :
     #print(job['title'])
@@ -43,6 +46,7 @@ for i, job in enumerate(jobs) :
     #all_skills_found = all_skills_found + flat_skills_found
 
 
+# SAVE DATA EXTRACTED
 with open('../../data/jobsFoundParsed.json', 'w') as fout:
     jobs = [job for job in jobs if 'skills_found' in job]
     json.dump(jobs, fout, ensure_ascii=False, indent = 4)
