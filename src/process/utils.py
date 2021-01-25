@@ -11,19 +11,17 @@ def getSkills():
     data = pd.read_excel('../../data/Skillset.xlsx', engine='openpyxl')
     skills_dict = {}
 
-    skills_dict['Maths'] = [x for x in data['Maths'].values.tolist() if str(x) != 'nan']
-    skills_dict['Business'] = [x for x in data['Business'].values.tolist() if str(x) != 'nan']
-    skills_dict['Marketing'] = [x for x in data['Marketing'].values.tolist() if str(x) != 'nan']
-    skills_dict['Prod_mgmt.'] = [x for x in data['Prod_mgmt.'].values.tolist() if str(x) != 'nan']
-    skills_dict['Mgmt.'] = [x for x in data['Mgmt.'].values.tolist() if str(x) != 'nan']
-    skills_dict['Soft_Skills'] = [x for x in data['Soft_Skills'].values.tolist() if str(x) != 'nan']
-    skills_dict['ML/AI'] = [x for x in data['ML/AI'].values.tolist() if str(x) != 'nan']
-    skills_dict['Analytics'] = [x for x in data['Analytics'].values.tolist() if str(x) != 'nan']
-    skills_dict['DevOps'] = [x for x in data['DevOps'].values.tolist() if str(x) != 'nan']
-    skills_dict['Coding'] = [x for x in data['Coding'].values.tolist() if str(x) != 'nan']
-    skills_dict['WebD'] = [x for x in data['WebD'].values.tolist() if str(x) != 'nan']
+    skills_dict['Maths'] = [x.lower() for x in data['Maths'].values.tolist() if str(x) != 'nan']
+    skills_dict['Autres'] = [x.lower() for x in data['Autres'].values.tolist() if str(x) != 'nan']
+    skills_dict['Soft_Skills'] = [x.lower() for x in data['Soft_Skills'].values.tolist() if str(x) != 'nan']
+    skills_dict['ML/AI'] = [x.lower() for x in data['ML/AI'].values.tolist() if str(x) != 'nan']
+    skills_dict['Visualisation'] = [x.lower() for x in data['Visualisation'].values.tolist() if str(x) != 'nan']
+    skills_dict['MLOps'] = [x.lower() for x in data['MLOps'].values.tolist() if str(x) != 'nan']
+    skills_dict['Langages'] = [x.lower() for x in data['Langages'].values.tolist() if str(x) != 'nan']
+    skills_dict['Web'] = [x.lower() for x in data['Web'].values.tolist() if str(x) != 'nan']
 
     return skills_dict
+
 
 
 def getSkillsList():
