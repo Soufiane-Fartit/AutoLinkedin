@@ -5,7 +5,7 @@ from docx.oxml.ns import qn
 from docx.oxml.shared import OxmlElement
 from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from data import *
+from resume_data import *
 from utils import getSkills, clusterSkills, merge_skills
 
 def add_header(doc, header):
