@@ -1,17 +1,17 @@
 .PHONY: all test clean
 PYTHON_INTERPRETER = python3
 
-cleaning :
+clean :
 	pwd
-	rm -f ../data/CVs/CV_*.docx
-	rm -f ../data/jobsFound.json
-	rm -f ../data/jobsFoundParsed.json
+	rm -f ../data/Resumes/CV_*.docx
+	rm -f ../data/ScrapedJobsData/jobsFound.json
+	rm -f ../data/ScrapedJobsData/jobsFoundParsed.json
 
-scraping :
-	cd scrap && $(PYTHON_INTERPRETER) scraper.py
+scrap :
+	cd scraping && $(PYTHON_INTERPRETER) scraper.py
 
-parsing :
-	cd process && $(PYTHON_INTERPRETER) parse.py
+parse :
+	cd processing && $(PYTHON_INTERPRETER) parse.py
 
-generating :
+generate :
 	cd autoCV && $(PYTHON_INTERPRETER) generate_cv.py

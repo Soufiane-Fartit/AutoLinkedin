@@ -326,7 +326,7 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
 
 
 # LOAD PARSED DATA
-with open('../../data/jobsFoundParsed.json', 'r') as jobs_file:
+with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'r') as jobs_file:
     jobs = json.load(jobs_file)
 
 # ITERATE OVER JOBS AND GENERATE CUSTOM RESUMES
@@ -338,10 +338,10 @@ for i, job in enumerate(jobs) :
 
     document = Document()
     document = redact_cv(document, header, profil, formation, experience, skills, certifs, projects, langues, job_skills)
-    document.save('../../data/CVs/CV_'+str(i)+'.docx')
+    document.save('../../data/Resumes/CV_'+str(i)+'.docx')
 
 
 # SAVE FILE NAMES OF THE RESUMES IN THE JSON FILE
-with open('../../data/jobsFoundParsed.json', 'w') as fout:
+with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'w') as fout:
     jobs = [job for job in jobs if 'skills_found' in job]
     json.dump(jobs, fout, ensure_ascii=False, indent = 4)
