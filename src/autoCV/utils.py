@@ -1,19 +1,14 @@
-def getSkills():
+def getSkills(skills_path):
     import pandas as pd
-
-    data = pd.read_excel('../../data/skills/Skillset.xlsx', engine='openpyxl')
+    data = pd.read_excel(skills_path, engine='openpyxl')
+    
     skills_dict = {}
+    skills_keys = data.columns[['Unnamed' not in x for x in data.columns]]
+    
+    for key in skills_keys :
+        skills_dict[key] = [x.lower() for x in data[key].values.tolist() if str(x) != 'nan']
 
-    skills_dict['Maths'] = [x.lower() for x in data['Maths'].values.tolist() if str(x) != 'nan']
-    skills_dict['Autres'] = [x.lower() for x in data['Autres'].values.tolist() if str(x) != 'nan']
-    skills_dict['Soft_Skills'] = [x.lower() for x in data['Soft_Skills'].values.tolist() if str(x) != 'nan']
-    skills_dict['ML/AI'] = [x.lower() for x in data['ML/AI'].values.tolist() if str(x) != 'nan']
-    skills_dict['Visualisation'] = [x.lower() for x in data['Visualisation'].values.tolist() if str(x) != 'nan']
-    skills_dict['MLOps'] = [x.lower() for x in data['MLOps'].values.tolist() if str(x) != 'nan']
-    skills_dict['Langages'] = [x.lower() for x in data['Langages'].values.tolist() if str(x) != 'nan']
-    skills_dict['Web'] = [x.lower() for x in data['Web'].values.tolist() if str(x) != 'nan']
-
-    return skills_dict
+    return skills_dict, skills_keys
 
 def findSkillType(skill, skills_dict):
     for skills_cat in skills_dict.keys():

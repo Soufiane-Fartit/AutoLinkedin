@@ -1,12 +1,14 @@
 import time
 import re
+import json
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from utils import *
 from getpass import getpass
 
 class Scraper:
-    """CONNETS TO LINKEDIN AND SEARCH FOR JOBS. JOBS FOUND WILL BE STORED IN /DATA/ScrapedJobsData/JOBSFOUND.JSON
+    """
+    CONNETS TO LINKEDIN AND SEARCH FOR JOBS. JOBS FOUND WILL BE STORED IN /DATA/ScrapedJobsData/JOBSFOUND.JSON
     """
     def __init__(self, search_links, driver_path="./chromedriver"):
         self.username = input("Your Email Please : ")
@@ -19,8 +21,10 @@ class Scraper:
         
 
     def login(self):
-        """CONNECTS TO LINKEDIN
         """
+        CONNECTS TO LINKEDIN
+        """
+
         self.browser.get('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
         time.sleep(3)
 
@@ -36,20 +40,23 @@ class Scraper:
         elementID.submit()
     
     def dumpJobsFound(self):
-        """SAVE JOBS INTO A JSON FILE
+        """
+        SAVE JOBS INTO A JSON FILE
         """
         import json
         with open('../../data/ScrapedJobsData/jobsFound.json', 'w') as fout:
             json.dump(self.job_dicts, fout, ensure_ascii=False, indent = 4)
 
     def scrapAllLinks(self):
-        """ITERATE OVER LINKS PROVIDED AND SCRAP JOBS FROM THEM
+        """
+        ITERATE OVER LINKS PROVIDED AND SCRAP JOBS FROM THEM
         """
         for search_link in self.search_links:
             self.scrapLink(search_link)
 
     def scrapLink(self, search_link):
-        """GIVEN A LINK IT ITERATES OVER JOBS ONE BY ONE AND SCRAP INFORMATION
+        """
+        GIVEN A LINK IT ITERATES OVER JOBS ONE BY ONE AND SCRAP INFORMATION
         """
         self.browser.get(search_link)
 
@@ -106,12 +113,18 @@ class Scraper:
             except :
                 pass
 
-# LINKS TO LOOK UP
-search_links = ["https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&keywords=data%20scientist%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance",
-                "https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&geoId=105015875&keywords=machine%20learning%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance&location=France",
-                "https://www.linkedin.com/jobs/search/?f_E=2&f_TPR=r86400&geoId=105015875&keywords=data%20analyst%20-experimente%20-%22ans%20d%27exp%C3%A9rience%22%20-senior%20-stage%20-stagiaire%20-alternance%20-doctorant%20-docteur%20-freelance&location=France"]
 
-scraper = Scraper(search_links, driver_path="../../chromedriver")
-scraper.login()
-scraper.scrapAllLinks()
-scraper.dumpJobsFound()
+def main():
+    # LINKS TO LOOK UP
+    with open('../../data/Input/searchConfig.json', 'r') as f:
+        d = json.load(f)
+    
+    search_links = [makeLinkFromKeywords(x['pos_keywords'], x['neg_keywords'], x['n_days']) for x in d]
+    
+    scraper = Scraper(search_links, driver_path="../../chromedriver")
+    scraper.login()
+    scraper.scrapAllLinks()
+    scraper.dumpJobsFound()
+
+if __name__ == '__main__':
+    main()

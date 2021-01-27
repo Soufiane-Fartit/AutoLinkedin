@@ -115,10 +115,7 @@
             "Neo4j",
             "Redis"
         ],
-        "Visualisation": [
-            "tableau"
-        ],
-        "ML/AI": [
+        "Data Science": [
             "Scikit-Learn",
             "Keras",
             "Tensorflow",
@@ -129,7 +126,10 @@
             "Matplotlib",
             "Seaborn"
         ],
-        "MLOps": [
+        "Visualisation": [
+            "tableau"
+        ],
+        "Machine Learning": [
             "Git",
             "DVC",
             "Flask",

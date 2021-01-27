@@ -1,0 +1,17 @@
+[
+    {
+        "pos_keywords" : ["data","scientist"],
+        "neg_keywords" : ["experimente", "ans", "experience", "senior", "stage", "stagiaire", "alternance", "doctorant", "docteur", "freelance"],
+        "n_days" : 1
+    },
+    {
+        "pos_keywords" : ["machine","learning"],
+        "neg_keywords" : ["experimente", "ans", "experience", "senior", "stage", "stagiaire", "alternance", "doctorant", "docteur", "freelance"],
+        "n_days" : 1
+    },
+    {
+        "pos_keywords" : ["data","analyst"],
+        "neg_keywords" : ["experimente", "ans", "experience", "senior", "stage", "stagiaire", "alternance", "doctorant", "docteur", "freelance"],
+        "n_days" : 1
+    }
+]

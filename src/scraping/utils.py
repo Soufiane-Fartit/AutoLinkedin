@@ -22,36 +22,13 @@ def classifyJob(title_):
     
     return list(jobs_list)[max_idx[0]]
 
-"""
-DEPRECATED - WILL BE REMOVED
-def classifyJob(title_):
-    title = title_.lower().replace("(","").replace(")","").replace("-","").split(" ")
-    if "data" in title and "scientist" in title:
-        title_ = "Data Scientist"
-    elif "data" in title and "analyst" in title:
-        title_ = "Data Analyst"
-    elif "données" in title and "analyste" in title:
-        title_ = "Data Analyst"
-    elif "données" in title and "ingenieur" in title:
-        title_ = "Data Engineer"
-    elif "data" in title and "engineer" in title:
-        title_ = "Data Engineer"
-    elif "machine" in title and "learning" in title and "engineer" in title:
-        title_ = "Ingénieur en Machine Learning"
-    elif "machine" in title and "learning" in title and "ingenieur" in title:
-        title_ = "Ingénieur en Machine Learning"
-    elif "developer" in title and "python" in title:
-        title_ = "Python Developer"
-    elif "developpeur" in title and "python" in title:
-        title_ = "Python Developer"
-    elif "dev" in title and "python" in title:
-        title_ = "Python Developer"
-    elif "engineer" in title and "python" in title and "software" in title:
-        title_ = "Python Developer"
-    elif "ingenieur" in title and "python" in title and "logiciel" in title:
-        title_ = "Python Developer"
-    else:
-        pass
+def makeLinkFromKeywords(pos_keywords, neg_keywords, n_days=1):
+    link = "https://www.linkedin.com/jobs/search/?"
+    link_FirstJob = "f_E=2&"
+    link_n_days = "f_TPR=r" + str(n_days * 86400) + "&"
 
-    return title_
-"""
+    neg_keywords = ["-"+x for x in neg_keywords]
+    link_keywords = "keywords=" + "%20".join(pos_keywords+neg_keywords)
+    final_link = link+ link_FirstJob + link_n_days + link_keywords
+    
+    return final_link

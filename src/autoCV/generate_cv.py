@@ -190,11 +190,27 @@ def add_skills(doc, skills, job_skills, n_cols=1):
     """
     doc = add_title(doc, "COMPETENCES TECHNIQUES")
 
+    #print(120*'-')
+    #print(f'skills : {skills}')
+    #print(f'job_skills : {job_skills}')
+
     if n_cols == 1 :
         default_skills = [item.lower() for sublist in skills.values() for item in sublist]
         missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
-        missing_skills_clustered = clusterSkills(missing_skills, getSkills())
+        skills_dict, skills_keys = getSkills('../../data/Input/Skillset-IT.xlsx')
+        missing_skills_clustered = clusterSkills(missing_skills, skills_dict)
         merged_skills = merge_skills(missing_skills_clustered, skills)
+
+        # SORT SKILLS BASED ON COLUMNS ORDER IN EXCEL FILE
+        merged_skills_ = {}
+        for key in skills_keys:
+            try :
+                merged_skills_[key] = merged_skills[key]
+            except :
+                pass
+        merged_skills = merged_skills_
+        #print(f'merged_skills : {merged_skills}')
+
         for k, v in merged_skills.items():
             if len(v) !=0 :
                 p = doc.add_paragraph(k + ' : ' + ', '.join(v))
@@ -208,8 +224,20 @@ def add_skills(doc, skills, job_skills, n_cols=1):
 
         default_skills = [item.lower() for sublist in skills.values() for item in sublist]
         missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
-        missing_skills_clustered = clusterSkills(missing_skills, getSkills())
+        skills_dict, skills_keys = getSkills('../../data/Input/Skillset-IT.xlsx')
+        missing_skills_clustered = clusterSkills(missing_skills, skills_dict)
         merged_skills = merge_skills(missing_skills_clustered, skills)
+        
+        # SORT SKILLS BASED ON COLUMNS ORDER IN EXCEL FILE
+        merged_skills_ = {}
+        for key in skills_keys:
+            try :
+                merged_skills_[key] = merged_skills[key]
+            except :
+                pass
+        merged_skills = merged_skills_
+        #print(f'merged_skills : {merged_skills}')
+
         for k, v in merged_skills.items():
             if len(v) !=0 :
                 p = doc.add_paragraph(k + ' : ' + ', '.join(v))
@@ -451,6 +479,7 @@ def main():
 
     # ITERATE OVER JOBS AND GENERATE CUSTOM RESUMES
     for i, job in enumerate(jobs) :
+        #print(f"---------------- {i} ----------------")
         job_skills = job['skills_found']
         job_title = job['title']
         
