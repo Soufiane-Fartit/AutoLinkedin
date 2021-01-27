@@ -14,4 +14,4 @@ parse :
 	cd processing && $(PYTHON_INTERPRETER) parse.py
 
 generate :
-	cd autoCV && $(PYTHON_INTERPRETER) generate_cv.py
+	cd autoCV && $(PYTHON_INTERPRETER) generate_cv.py --columns 2 --picture "../../data/Input/profile_picture.png"

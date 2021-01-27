@@ -1,13 +1,14 @@
+import argparse
 import json
 from docx import Document
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor, Inches
 from docx.oxml.ns import qn
 from docx.oxml.shared import OxmlElement
-from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+from docx.enum.section import WD_SECTION
 from utils import getSkills, clusterSkills, merge_skills
 
-def add_header(doc, header):
+def add_header_without_picture(doc, header):
     """ADD THE HEADER OF THE RESUME (NAME, ADRESS, EMAIL...)
 
     Args:
@@ -37,6 +38,64 @@ def add_header(doc, header):
 
     return doc
 
+def add_header_with_picture(doc, header, picture_path):
+    """ADD THE HEADER OF THE RESUME (NAME, ADRESS, EMAIL...)
+
+    Args:
+        doc ([docx document]): [description]
+        header ([json]): json containing the name, adress, email ..
+
+    Returns:
+        [docx document]: the same docx document with the header added to it
+    """
+
+    table = doc.add_table(rows=1, cols=3)
+    table.rows[0].cells[0].width = Inches(4.7)
+    table.rows[0].cells[1].width = Inches(2)
+    table.rows[0].cells[2].width = Inches(1.7)
+
+    # ADD THE PICTURE
+    cell = table.cell(0, 2)
+    cell._element.clear_content()
+    p = cell.add_paragraph()
+    p.add_run().add_picture(picture_path, width=Inches(1))
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.line_spacing = 0
+    p.paragraph_format.space_before = Cm(0)
+    p.paragraph_format.space_after = Cm(0)
+    p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY
+
+    # ADD NAME
+    cell = table.cell(0, 0)
+    cell._element.clear_content()
+    p = cell.add_paragraph(header['name'])
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.line_spacing = 0
+    p.paragraph_format.space_before = Cm(0)
+    p.paragraph_format.space_after = Cm(0.6)
+    p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY
+    for run in p.runs :
+        run.font.size = Pt(17)
+
+    # ADD THE REST OF INFOS
+    lines = [['city', 'phone', 'email'],
+            ['linkedin', 'github']]
+    for line in lines :
+        p = cell.add_paragraph(' | '.join([header[x] for x in line]))
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.line_spacing = 0
+        p.paragraph_format.space_before = Cm(0)
+        p.paragraph_format.space_after = Cm(0)
+        p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY
+
+    return doc
+
+def add_header(doc, header, picture_path=None):
+    if picture_path :
+        doc = add_header_with_picture(doc, header, picture_path)
+    else:
+        doc = add_header_without_picture(doc, header)
+    return doc
 
 def add_profil(doc, profil):
     """ADD FEW LINES ABOUT THE PERSON
@@ -119,7 +178,7 @@ def add_experience(doc, experience):
 
     return doc
 
-def add_skills(doc, skills, skills_var=None):
+def add_skills(doc, skills, job_skills, n_cols=1):
     """ADD SKILLS SECTION TO THE RESUME
 
     Args:
@@ -130,21 +189,40 @@ def add_skills(doc, skills, skills_var=None):
         [type]: [description]
     """
     doc = add_title(doc, "COMPETENCES TECHNIQUES")
-    default_skills = [item.lower() for sublist in skills.values() for item in sublist]
-    missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
-    missing_skills_clustered = clusterSkills(missing_skills, getSkills())
-    merged_skills = merge_skills(missing_skills_clustered, skills)
-    #print(f'merged_skills : {merged_skills}')
-    for k, v in merged_skills.items():
-        if len(v) !=0 :
-            p = doc.add_paragraph(k + ' : ' + ', '.join(v))
-            p.paragraph_format.line_spacing = 1
-            p.paragraph_format.space_before = Cm(0)
-            p.paragraph_format.space_after = Cm(0)
+
+    if n_cols == 1 :
+        default_skills = [item.lower() for sublist in skills.values() for item in sublist]
+        missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
+        missing_skills_clustered = clusterSkills(missing_skills, getSkills())
+        merged_skills = merge_skills(missing_skills_clustered, skills)
+        for k, v in merged_skills.items():
+            if len(v) !=0 :
+                p = doc.add_paragraph(k + ' : ' + ', '.join(v))
+                p.paragraph_format.line_spacing = 1
+                p.paragraph_format.space_before = Cm(0)
+                p.paragraph_format.space_after = Cm(0)
+    
+    else :
+        section = doc.add_section(WD_SECTION.CONTINUOUS)
+        set_number_of_columns(section, n_cols)
+
+        default_skills = [item.lower() for sublist in skills.values() for item in sublist]
+        missing_skills = [x.lower() for x in job_skills if x.lower() not in default_skills]
+        missing_skills_clustered = clusterSkills(missing_skills, getSkills())
+        merged_skills = merge_skills(missing_skills_clustered, skills)
+        for k, v in merged_skills.items():
+            if len(v) !=0 :
+                p = doc.add_paragraph(k + ' : ' + ', '.join(v))
+                p.paragraph_format.line_spacing = 1
+                p.paragraph_format.space_before = Cm(0)
+                p.paragraph_format.space_after = Cm(0)
+        
+        section = doc.add_section(WD_SECTION.CONTINUOUS)
+        set_number_of_columns(section, 1)
 
     return doc
 
-def add_certif_projects(doc, certifs, projects):
+def add_certif_projects(doc, certifs, projects, n_cols=1):
     """ADD CERTIFICATIONS AND PROJECTS SECTION TO THE RESUME
 
     Args:
@@ -156,13 +234,27 @@ def add_certif_projects(doc, certifs, projects):
     """
     doc = add_title(doc, "CERTIFICATIONS ET PROJETS PERSONNELS")
 
-    for certif in certifs:
-        p = doc.add_paragraph(certif, style='List Bullet')
-        p.paragraph_format.line_spacing = 1
-    for project in projects:
-        p = doc.add_paragraph(project, style='List Bullet')
-        p.paragraph_format.line_spacing = 1
-
+    if n_cols == 1 :
+        for certif in certifs:
+            p = doc.add_paragraph(certif, style='List Bullet')
+            p.paragraph_format.line_spacing = 1
+        for project in projects:
+            p = doc.add_paragraph(project, style='List Bullet')
+            p.paragraph_format.line_spacing = 1
+    else :
+        section = doc.add_section(WD_SECTION.CONTINUOUS)
+        set_number_of_columns(section, n_cols)
+        
+        for certif in certifs:
+            p = doc.add_paragraph(certif, style='List Bullet')
+            p.paragraph_format.line_spacing = 1
+        for project in projects:
+            p = doc.add_paragraph(project, style='List Bullet')
+            p.paragraph_format.line_spacing = 1
+        
+        section = doc.add_section(WD_SECTION.CONTINUOUS)
+        set_number_of_columns(section, 1)
+    
     return doc
 
 def add_langues(doc, langues):
@@ -195,7 +287,7 @@ def set_margin(doc, margin = 1.0):
     Returns:
         [type]: [description]
     """
-    sections = document.sections
+    sections = doc.sections
     for section in sections:
         section.top_margin = Cm(margin)
         section.bottom_margin = Cm(margin)
@@ -227,6 +319,10 @@ def insert_element_before(parent, elm, successors):
         parent.append(elm)
     return elm
 
+def set_number_of_columns(section, cols):
+    """ sets number of columns through xpath. """
+    WNS_COLS_NUM = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}num"
+    section._sectPr.xpath("./w:cols")[0].set(WNS_COLS_NUM, str(cols))
 
 def add_title(doc, title):
     """
@@ -234,7 +330,7 @@ def add_title(doc, title):
     """
     pp = doc.add_paragraph()
     pp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    pp.paragraph_format.space_before = Cm(0.3)
+    pp.paragraph_format.space_before = Cm(0.5)
     pp.paragraph_format.space_after = Cm(0.1)
     run = pp.add_run(title)
     #run.bold = True
@@ -278,7 +374,7 @@ def add_title(doc, title):
 
     return doc
 
-def redact_cv(doc, header, profil, formation, experience, skills, certifs, projects, langues, skills_var=None):
+def redact_cv(doc, header_, profil, formation, experience, skills, certifs, projects, langues, job_title, job_skills, picture_path=None, n_cols=1):
     """
     CREATE A RESUME FROM A JSON CONTAINING INFOS ABOUT A JOB
 
@@ -292,16 +388,24 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
         certifs ([type]): [description]
         projects ([type]): [description]
         langues ([type]): [description]
-        skills_var ([type], optional): [description]. Defaults to None.
 
     Returns:
         [docx document]: THE FULL RESUME GENERATED
     """
+
+    # IF USING A PICTURE
+    # WE USE TWO COLUMNS IN THE SKILLS AND CERTIFICATIONS SECTIONS
+    # TO FIT THE RESUME IN ONE PAGE
+    if picture_path and n_cols==1:
+        n_cols = 2
+
     # ADD NAME, PHONE, ADRESS, EMAIL ...
-    doc = add_header(doc, header)
+
+    # PICTURE PATH IS NOT MANDATORY
+    doc = add_header(doc, header_, picture_path)
 
     # ADD A FEW LINES ABOUT ME
-    doc = add_profil(doc, [x.replace('<job_title>', job['title']) for x in profil])
+    doc = add_profil(doc, [x.replace('<job_title>', job_title) for x in profil])
 
     # ADD EDUCATION SECTION
     doc = add_formation(doc, formation)
@@ -310,10 +414,10 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
     doc = add_experience(doc, experience)
 
     # ADD SKILLS SECTION
-    doc = add_skills(doc, skills, skills_var)
+    doc = add_skills(doc, skills, job_skills, n_cols=n_cols)
 
     # ADD CERTIFS PERS PROJECTS
-    doc = add_certif_projects(doc, certifs, projects)
+    doc = add_certif_projects(doc, certifs, projects, n_cols=n_cols)
 
     # ADD SPOKE LANGUAGES
     doc = add_langues(doc, langues)
@@ -323,27 +427,52 @@ def redact_cv(doc, header, profil, formation, experience, skills, certifs, proje
 
     return doc
 
-with open('resume_data.json', 'r') as f:
-    d = json.load(f)
-    header, profil, formation, experience, skills, certifs, projects, langues = d['header'], d['profil'], d['formation'], d['experience'], d['skills'], d['certifs'], d['projects'], d['langues']
+def main():
+    # GET ARGUMENTS
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--columns", type=int, help="numnber of columns for skills and certificates sections")
+    parser.add_argument("-p", "--picture", type=str, help="path to the picture")
+    args = parser.parse_args()
+    n_cols = args.columns
+    picture_path = args.picture
 
-# LOAD PARSED DATA
-with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'r') as jobs_file:
-    jobs = json.load(jobs_file)
+    assert not(n_cols==1 and picture_path), "you can't set columns=1 when using a picture"
 
-# ITERATE OVER JOBS AND GENERATE CUSTOM RESUMES
-for i, job in enumerate(jobs) :
-    job_skills = job['skills_found']
-    
-    jobs[i]['id_code'] = i
-    jobs[i]['filename'] = 'CV_'+str(i)+'.docx'
+    if n_cols==None and picture_path==None:
+        n_cols = 1
 
-    document = Document()
-    document = redact_cv(document, header, profil, formation, experience, skills, certifs, projects, langues, job_skills)
-    document.save('../../data/Resumes/CV_'+str(i)+'.docx')
+    with open('../../data/Input/resume_data.json', 'r') as f:
+        d = json.load(f)
+        header, header_with_picture_temporary_element, profil, formation, experience, skills, certifs, projects, langues = d['header'], d['header_with_picture_temporary_element'], d['profil'], d['formation'], d['experience'], d['skills'], d['certifs'], d['projects'], d['langues']
 
+    # LOAD PARSED DATA
+    with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'r') as jobs_file:
+        jobs = json.load(jobs_file)
 
-# SAVE FILE NAMES OF THE RESUMES IN THE JSON FILE
-with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'w') as fout:
-    jobs = [job for job in jobs if 'skills_found' in job]
-    json.dump(jobs, fout, ensure_ascii=False, indent = 4)
+    # ITERATE OVER JOBS AND GENERATE CUSTOM RESUMES
+    for i, job in enumerate(jobs) :
+        job_skills = job['skills_found']
+        job_title = job['title']
+        
+        jobs[i]['id_code'] = i
+        jobs[i]['filename'] = 'CV_'+str(i)+'.docx'
+
+        document = Document()
+
+        
+        if picture_path :
+            # WITH PICTURE
+            document = redact_cv(document, header_with_picture_temporary_element, profil, formation, experience, skills, certifs, projects, langues, job_title, job_skills, picture_path=picture_path, n_cols=n_cols)
+        else :
+            # WITHOUT PICTURE
+            document = redact_cv(document, header, profil, formation, experience, skills, certifs, projects, langues, job_title, job_skills, n_cols=n_cols)
+        
+        document.save('../../data/Resumes/CV_'+str(i)+'.docx')
+
+    # SAVE FILE NAMES OF THE RESUMES IN THE JSON FILE
+    with open('../../data/ScrapedJobsData/jobsFoundParsed.json', 'w') as fout:
+        jobs = [job for job in jobs if 'skills_found' in job]
+        json.dump(jobs, fout, ensure_ascii=False, indent = 4)
+
+if __name__ == '__main__':
+    main()

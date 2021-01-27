@@ -45,6 +45,7 @@ make parsing
 
 > generate custom resumes for each job :
 ```
-make generating
+cd autoCV && $(PYTHON_INTERPRETER) generate_cv.py --columns 2 --picture "../../data/Input/profile_picture.png"
 ```
+if using a picture, the number of columns should be more than one. 
 
