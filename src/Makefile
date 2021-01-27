@@ -8,7 +8,7 @@ clean :
 	rm -f ../data/ScrapedJobsData/jobsFoundParsed.json
 
 scrap :
-	cd scraping && $(PYTHON_INTERPRETER) scraper.py
+	cd scraping && $(PYTHON_INTERPRETER) scrap.py
 
 parse :
 	cd processing && $(PYTHON_INTERPRETER) parse.py

@@ -407,11 +407,11 @@ def redact_cv(doc, header_, profil, formation, experience, skills, certifs, proj
     # ADD A FEW LINES ABOUT ME
     doc = add_profil(doc, [x.replace('<job_title>', job_title) for x in profil])
 
-    # ADD EDUCATION SECTION
-    doc = add_formation(doc, formation)
-
     # ADD PRO EXP SECTION
     doc = add_experience(doc, experience)
+
+    # ADD EDUCATION SECTION
+    doc = add_formation(doc, formation)
 
     # ADD SKILLS SECTION
     doc = add_skills(doc, skills, job_skills, n_cols=n_cols)
