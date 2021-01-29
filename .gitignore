@@ -1,5 +1,5 @@
 /data/Random/*
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+/src/*/__pycache__/
 *.py[cod]
